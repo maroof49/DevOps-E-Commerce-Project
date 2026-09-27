@@ -1,7 +1,5 @@
 # DevOps E-Commerce Demo
 
-![Uploading image.png…]()
-
 A small full-stack e-commerce application for practicing:
 
 Git -> Jenkins -> Maven -> Docker -> Docker Hub -> AWS EKS -> Kubernetes Ingress -> AWS ALB -> Route 53 -> GoDaddy -> HTTPS
