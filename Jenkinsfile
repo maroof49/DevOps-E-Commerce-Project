@@ -85,8 +85,8 @@ pipeline {
                           aws ecr get-login-password --region ${AWS_REGION} | \
                           docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-                          docker build -f backend.Dockerfile -t ${BACKEND_REPO}:${IMAGE_TAG}
-                          docker push ${BACKEND_REPO}:${IMAGE_TAG}
+                          docker build -f backend.Dockerfile -t ${BACKEND_IMAGE}:${IMAGE_TAG}
+                          docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
 
                             docker build -f Dockerfile.frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} .
                             docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
