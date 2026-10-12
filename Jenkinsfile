@@ -74,16 +74,16 @@ pipeline {
         stage('Docker image Build & AWS ECR Push') {
             steps {
                 script {
-                    //def imageTag = "${env.BUILD_NUMBER}"
+                    
                   env.IMAGE_TAG = sh(
                     script: 'git rev-parse --short HEAD',
                     returnStdout: true
                     ).trim()
                     
-                    withAWS(credentials: 'aws_credentials', region: "${AWS_REGION}") {
+                    withAWS(credentials: 'aws_credentials', region: "ap-south-1") {
                         sh """
-                          aws ecr get-login-password --region ${AWS_REGION} | \
-                          docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                          aws ecr get-login-password --region ap-south-1 | \
+                          docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
 
                           docker build -f backend.Dockerfile -t ${BACKEND_IMAGE}:${IMAGE_TAG}
                           docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
