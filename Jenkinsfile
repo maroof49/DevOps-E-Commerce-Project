@@ -15,10 +15,13 @@ pipeline {
     // }
 
     stages {
-        stage('Checkout') {
-            steps { checkout scm }
+   
+       stage('Checkout') {
+            steps {
+                git branch: 'main', 
+                    url: 'https://github.com/maroof49/DevOps-E-Commerce-Project.git'
+            }
         }
-
         stage('Test Backend') {
             steps { sh 'cd backend && mvn -B test' }
         }
@@ -27,21 +30,21 @@ pipeline {
             steps { sh 'cd backend && mvn -B clean package -DskipTests' }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    env.IMAGE_TAG = sh(
-                        script: 'git rev-parse --short HEAD',
-                        returnStdout: true
-                    ).trim()
+        // stage('Build Docker Images') {
+        //     steps {
+        //         script {
+        //             env.IMAGE_TAG = sh(
+        //                 script: 'git rev-parse --short HEAD',
+        //                 returnStdout: true
+        //             ).trim()
 
-                    sh '''
-                      docker build -f Dockerfile.backend -t $BACKEND_IMAGE:$IMAGE_TAG .
-                      docker build -f Dockerfile.frontend -t $FRONTEND_IMAGE:$IMAGE_TAG .
-                    '''
-                }
-            }
-        }
+        //             sh '''
+        //               docker build -f Dockerfile.backend -t $BACKEND_IMAGE:$IMAGE_TAG .
+        //               docker build -f Dockerfile.frontend -t $FRONTEND_IMAGE:$IMAGE_TAG .
+        //             '''
+        //         }
+        //     }
+        // }
 
         // stage('Push Docker Images') {
         //     steps {
