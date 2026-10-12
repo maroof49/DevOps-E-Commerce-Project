@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+
+        maven mvn
+    }
     // environment {
     //     DOCKERHUB_USER = 'YOUR_DOCKERHUB_USERNAME'
     //    # BACKEND_IMAGE = "${DOCKERHUB_USER}/ecommerce-backend"
