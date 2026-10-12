@@ -93,6 +93,8 @@ pipeline {
         //           kubectl -n "$NAMESPACE" rollout status deployment/ecommerce-frontend --timeout=180s
         //         '''
         //     }
-        // }
+     }
 }
 
+
+        
