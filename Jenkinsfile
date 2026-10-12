@@ -35,11 +35,13 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                   // env.IMAGE_TAG = sh(
-                    //    script: 'git rev-parse --short HEAD',
-                    //    returnStdout: true
-                    //).trim()
-                    def IMAGE_TAG = "${env.BUILD_NUMBER}"
+                    
+                    env.IMAGE_TAG = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                    
+                    //def IMAGE_TAG = "${env.BUILD_NUMBER}"
                     sh '''
                       docker build -f Dockerfile.backend -t ${BACKEND_IMAGE}:${IMAGE_TAG} .
                       docker build -f Dockerfile.frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} .
