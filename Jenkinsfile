@@ -23,6 +23,7 @@ pipeline {
                     url: 'https://github.com/maroof49/DevOps-E-Commerce-Project.git'
             }
         }
+        
         stage('Test Backend') {
             steps { sh 'cd backend && mvn -B test' }
         }
@@ -57,6 +58,7 @@ pipeline {
                       docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
                       docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
                     """
+                    }
                 }
             }
         // stage('Push Docker Images') {
