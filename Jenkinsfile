@@ -5,14 +5,14 @@ pipeline {
         jdk 'jdk17'
         maven 'mvn'
     }
-    // environment {
-    //     DOCKERHUB_USER = 'YOUR_DOCKERHUB_USERNAME'
-    //    # BACKEND_IMAGE = "${DOCKERHUB_USER}/ecommerce-backend"
-    //     #FRONTEND_IMAGE = "${DOCKERHUB_USER}/ecommerce-frontend"
-    //     #AWS_REGION = 'ap-south-1'
-    //     #EKS_CLUSTER = 'YOUR_EKS_CLUSTER'
-    //     #NAMESPACE = 'ecommerce'
-    // }
+    environment {
+       // DOCKERHUB_USER = 'YOUR_DOCKERHUB_USERNAME'
+        BACKEND_IMAGE = "280224036415.dkr.ecr.ap-south-1.amazonaws.com/dev/backend-image"
+        FRONTEND_IMAGE = "280224036415.dkr.ecr.ap-south-1.amazonaws.com/dev/frontend-image"
+        AWS_REGION = 'ap-south-1'
+        //EKS_CLUSTER = 'YOUR_EKS_CLUSTER'
+        //NAMESPACE = 'ecommerce'
+    }
 
     stages {
    
@@ -33,19 +33,32 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    env.IMAGE_TAG = sh(
-                        script: 'git rev-parse --short HEAD',
-                        returnStdout: true
-                    ).trim()
-
+                   // env.IMAGE_TAG = sh(
+                    //    script: 'git rev-parse --short HEAD',
+                    //    returnStdout: true
+                    //).trim()
+                    def IMAGE_TAG = "${env.BUILD_NUMBER}"
                     sh '''
-                      docker build -f Dockerfile.backend -t backend-image:$IMAGE_TAG .
-                      docker build -f Dockerfile.frontend -t frontend-image:$IMAGE_TAG .
+                      docker build -f Dockerfile.backend -t $BACKEND_IMAGE:$IMAGE_TAG .
+                      docker build -f Dockerfile.frontend -t $FRONTEND_IMAGE:$IMAGE_TAG .
                     '''
                 }
             }
         }
 
+            stage('Push to AWS ECR') {
+            steps {
+                withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-creds')]) {
+                    script {
+                        sh """
+                          aws ecr get-login-password --region $AWS_REGION | \
+                          docker login --username AWS --password-stdin ${BACKEND_REPO%/*}
+
+                          docker push $BACKEND_REPO:$IMAGE_TAG
+                          docker push $FRONTEND_REPO:$IMAGE_TAG
+                        """
+                    }
+                }
         // stage('Push Docker Images') {
         //     steps {
         //         withCredentials([usernamePassword(
