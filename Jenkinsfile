@@ -39,8 +39,8 @@ pipeline {
                     ).trim()
 
                     sh '''
-                      docker build -f Dockerfile.backend -t BACKEND_IMAGE:$IMAGE_TAG .
-                      docker build -f Dockerfile.frontend -t FRONTEND_IMAGE:$IMAGE_TAG .
+                      docker build -f Dockerfile.backend -t backend-image:$IMAGE_TAG .
+                      docker build -f Dockerfile.frontend -t frontend-image:$IMAGE_TAG .
                     '''
                 }
             }
