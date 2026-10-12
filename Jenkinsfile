@@ -41,8 +41,8 @@ pipeline {
                     //).trim()
                     def IMAGE_TAG = "${env.BUILD_NUMBER}"
                     sh '''
-                      docker build -f Dockerfile.backend -t $BACKEND_IMAGE:$IMAGE_TAG .
-                      docker build -f Dockerfile.frontend -t $FRONTEND_IMAGE:$IMAGE_TAG .
+                      docker build -f Dockerfile.backend -t ${BACKEND_IMAGE}:${IMAGE_TAG} .
+                      docker build -f Dockerfile.frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} .
                     '''
                 }
             }
