@@ -10,6 +10,7 @@ pipeline {
         BACKEND_IMAGE = "280224036415.dkr.ecr.ap-south-1.amazonaws.com/dev/backend-image"
         FRONTEND_IMAGE = "280224036415.dkr.ecr.ap-south-1.amazonaws.com/dev/frontend-image"
         AWS_REGION = 'ap-south-1'
+        ACCOUNT_ID = '280224036415'
         //EKS_CLUSTER = 'YOUR_EKS_CLUSTER'
         //NAMESPACE = 'ecommerce'
     }
@@ -48,17 +49,16 @@ pipeline {
 
             stage('Push to AWS ECR') {
             steps {
-                withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-creds')]) {
-                    script {
-                        sh """
-                          aws ecr get-login-password --region $AWS_REGION | \
-                          docker login --username AWS --password-stdin ${BACKEND_REPO%/*}
-
-                          docker push $BACKEND_REPO:$IMAGE_TAG
-                          docker push $FRONTEND_REPO:$IMAGE_TAG
-                        """
-                    }
+                withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-cred')]) {
+                    sh """
+                      aws ecr get-login-password --region ${AWS_REGION} | \
+                      docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
+                
+                      docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+                      docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+                    """
                 }
+            }
         // stage('Push Docker Images') {
         //     steps {
         //         withCredentials([usernamePassword(
@@ -94,5 +94,5 @@ pipeline {
         //         '''
         //     }
         // }
-    }
 }
+
