@@ -3,7 +3,7 @@ pipeline {
 
     tools {
 
-        maven mvn
+        maven 'mvn'
     }
     // environment {
     //     DOCKERHUB_USER = 'YOUR_DOCKERHUB_USERNAME'
