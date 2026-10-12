@@ -17,7 +17,7 @@ pipeline {
         BACKEND_IMAGE = "280224036415.dkr.ecr.ap-south-1.amazonaws.com/dev/backend-image"
         FRONTEND_IMAGE = "280224036415.dkr.ecr.ap-south-1.amazonaws.com/dev/frontend-image"
         AWS_REGION = 'ap-south-1'
-        ACCOUNT_ID = '280224036415'
+        AWS_ACCOUNT_ID = '280224036415'
         //EKS_CLUSTER = 'YOUR_EKS_CLUSTER'
         //NAMESPACE = 'ecommerce'
     }
@@ -39,59 +39,62 @@ pipeline {
             steps { sh 'cd backend && mvn -B clean package -DskipTests' }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    
-                    env.IMAGE_TAG = sh(
-                        script: 'git rev-parse --short HEAD',
-                        returnStdout: true
-                    ).trim()
-                    
-                    //def IMAGE_TAG = "${env.BUILD_NUMBER}"
-                    sh '''
-                      docker build -f Dockerfile.backend -t ${BACKEND_IMAGE}:${IMAGE_TAG} .
-                      docker build -f Dockerfile.frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} .
-                    '''
-                }
-            }
-        }
-    
-            stage('Push to AWS ECR') {
-            steps {
-                withCredentials([amazonWebServicesCredentials(credentialsId: 'aws_credentials')]) {
-                    sh """
-                      aws ecr get-login-password --region ${AWS_REGION} | \
-                      docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
-                
-                      docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
-                      docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
-                    """
-                    }
-                }
-            }
-
-        // stage('Docker image Build & AWS ECR Push') {
+        // stage('Build Docker Images') {
         //     steps {
         //         script {
-        //             //def imageTag = "${env.BUILD_NUMBER}"
-        //           env.IMAGE_TAG = sh(
-        //             script: 'git rev-parse --short HEAD',
-        //             returnStdout: true
+                    
+        //             env.IMAGE_TAG = sh(
+        //                 script: 'git rev-parse --short HEAD',
+        //                 returnStdout: true
         //             ).trim()
                     
-        //             withAWS(credentials: 'aws_credentials', region: "${AWS_REGION}") {
-        //                 sh """
-        //                   aws ecr get-login-password --region $AWS_REGION | \
-        //                   docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
-        //                   docker build -f backend/Dockerfile -t $BACKEND_REPO:$imageTag backend
-        //                   docker push $BACKEND_REPO:$imageTag
-        //                 """
-        //             }
+        //             //def IMAGE_TAG = "${env.BUILD_NUMBER}"
+        //             sh '''
+        //               docker build -f Dockerfile.backend -t ${BACKEND_IMAGE}:${IMAGE_TAG} .
+        //               docker build -f Dockerfile.frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} .
+        //             '''
         //         }
         //     }
         // }
+    
+        //     stage('Push to AWS ECR') {
+        //     steps {
+        //         withCredentials([amazonWebServicesCredentials(credentialsId: 'aws_credentials')]) {
+        //             sh """
+        //               aws ecr get-login-password --region ${AWS_REGION} | \
+        //               docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
+                
+        //               docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+        //               docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+        //             """
+        //             }
+        //         }
+        //     }
+
+        stage('Docker image Build & AWS ECR Push') {
+            steps {
+                script {
+                    //def imageTag = "${env.BUILD_NUMBER}"
+                  env.IMAGE_TAG = sh(
+                    script: 'git rev-parse --short HEAD',
+                    returnStdout: true
+                    ).trim()
+                    
+                    withAWS(credentials: 'aws_credentials', region: "${AWS_REGION}") {
+                        sh """
+                          aws ecr get-login-password --region ${AWS_REGION} | \
+                          docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+                          docker build -f backend.Dockerfile -t ${BACKEND_REPO}:${IMAGE_TAG}
+                          docker push ${BACKEND_REPO}:${IMAGE_TAG}
+
+                            docker build -f Dockerfile.frontend -t ${FRONTEND_IMAGE}:${IMAGE_TAG} .
+                            docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+                        """
+                    }
+                }
+            }
+        }
         // stage('Push Docker Images') {
         //     steps {
         //         withCredentials([usernamePassword(
